@@ -12,7 +12,7 @@
 
 /* minimal syscall-based read of file into mmap */
 static char* read_file_to_buffer(const char* path, size_t* out_len) {
-    int fd = open(path, O_RDONLY);
+    int fd = openat(AT_FDCWD, path, O_RDONLY);
     if (fd < 0) return NULL;
     struct stat st;
     if (fstat(fd, &st) < 0) { close(fd); return NULL; }
@@ -55,7 +55,7 @@ int main(int argc, char** argv) {
     scope_init(&sc, lmalloc, lfree);
 
     /* open output file for assembly */
-    int outfd = open(argv[2], O_WRONLY | O_CREAT | O_TRUNC, 0644);
+    int outfd = openat(AT_FDCWD, argv[2], O_WRONLY | O_CREAT | O_TRUNC, 0644);
     if (outfd < 0) {
         const char* msg = "failed to open output\n";
         (void)write(2, msg, lstrlen(msg));
